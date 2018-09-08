@@ -65,7 +65,7 @@ class CommandCollection implements IteratorAggregate, Countable
             );
         }
 
-        $this->commands[$name] = $command;
+        $this->commands[$name] = is_string($command) ? new $command : $command;
 
         return $this;
     }

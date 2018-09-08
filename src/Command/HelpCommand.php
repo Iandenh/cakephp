@@ -96,7 +96,11 @@ class HelpCommand extends Command implements CommandCollectionAwareInterface
         }
 
         foreach ($commands as $name => $class) {
+            $description = '';
             if (is_object($class)) {
+                if($class instanceof Command) {
+                    $description = $class->getDescription();
+                }
                 $class = get_class($class);
             }
             if (count($invert[$class]) == 1) {
@@ -108,7 +112,7 @@ class HelpCommand extends Command implements CommandCollectionAwareInterface
                 usort($invert[$class], function ($a, $b) {
                     return strlen($a) - strlen($b);
                 });
-                $io->out('- ' . array_shift($invert[$class]));
+                $io->out('- ' . array_shift($invert[$class]) . '(' . $description . ')');
 
                 // Empty the list to prevent duplicates
                 $invert[$class] = [];

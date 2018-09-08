@@ -53,6 +53,13 @@ class Command
     protected $name = 'cake unknown';
 
     /**
+     * The description of this command.
+     *
+     * @var string
+     */
+    protected $description = '';
+
+    /**
      * Constructor
      *
      * By default CakePHP will construct command objects when
@@ -97,6 +104,30 @@ class Command
     {
         return $this->name;
     }
+
+    /**
+     * Get the command description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Set the command description.
+     *
+     * @param string $description The description
+     * @return $this
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
 
     /**
      * Get the option parser.

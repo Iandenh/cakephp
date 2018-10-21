@@ -69,6 +69,7 @@ class DateTimeType extends Type implements TypeInterface, BatchCastingInterface
      * @var string|array
      */
     protected $_format = [
+        'Y-m-d\TH:i:s.u',
         'Y-m-d H:i:s',
         'Y-m-d\TH:i:sP',
     ];

@@ -68,6 +68,72 @@ class ConsoleInput
     }
 
     /**
+     * Read a value from the stream
+     *
+     * @return mixed The value of the stream
+     */
+    public function readHidden()
+    {
+        if ($this->hasStty()) {
+            shell_exec('stty -echo');
+            $value = fgets($this->_input);
+            shell_exec('stty echo');
+
+            return $value;
+        }
+
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $exe = __DIR__ . '/resources/hiddeninput.exe';
+
+            return shell_exec($exe);
+        }
+
+        $shell = $this->getShell();
+
+        if ($shell) {
+            $readCmd = 'csh' === $shell ? 'set mypassword = $<' : 'read -r mypassword';
+            $command = sprintf("/usr/bin/env %s -c 'stty -echo; %s; stty echo; echo \$mypassword'", $shell, $readCmd);
+
+            return shell_exec($command);
+        }
+    }
+
+
+    /**
+     * @return bool
+     * @internal
+     *
+     */
+    protected function hasStty()
+    {
+        exec('stty 2>&1', $output, $exitCode);
+
+        return $exitCode === Command::CODE_SUCCESS;
+    }
+
+    /**
+     * Returns a valid unix shell
+     *
+     * @return string|bool The valid shell name, false in case no valid shell is found
+     */
+    protected function getShell()
+    {
+        $shell = false;
+        if (file_exists('/usr/bin/env')) {
+            // handle other OSs with bash/zsh/ksh/csh if available to hide the answer
+            $test = "/usr/bin/env %s -c 'echo OK' 2> /dev/null";
+            foreach (['bash', 'zsh', 'ksh', 'csh'] as $sh) {
+                if (rtrim(shell_exec(sprintf($test, $sh))) === 'OK') {
+                    $shell = $sh;
+                    break;
+                }
+            }
+        }
+
+        return $shell;
+    }
+
+    /**
      * Check if data is available on stdin
      *
      * @param int $timeout An optional time to wait for data

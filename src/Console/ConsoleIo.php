@@ -12,6 +12,7 @@
  * @since         3.0.0
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Cake\Console;
 
 use Cake\Console\Exception\StopException;
@@ -391,6 +392,21 @@ class ConsoleIo
     }
 
     /**
+     * Prompts the user for input, and returns it.
+     *
+     * @param string $prompt Prompt text.
+     * @param string|null $default Default input value.
+     * @return string Either the default value, or the user-provided input.
+     */
+    public function askHidden($prompt, $default = null)
+    {
+        $value = $this->_getInput($prompt, null, $default, true);
+        $this->out('');
+
+        return $value;
+    }
+
+    /**
      * Change the output mode of the stdout stream
      *
      * @param int $mode The output mode.
@@ -405,9 +421,9 @@ class ConsoleIo
     /**
      * Change the output mode of the stdout stream
      *
-     * @deprecated 3.5.0 Use setOutputAs() instead.
      * @param int $mode The output mode.
      * @return void
+     * @deprecated 3.5.0 Use setOutputAs() instead.
      * @see \Cake\Console\ConsoleOutput::outputAs()
      */
     public function outputAs($mode)
@@ -473,7 +489,7 @@ class ConsoleIo
      * @param string|null $default Default input value. Pass null to omit.
      * @return string Either the default value, or the user-provided input.
      */
-    protected function _getInput($prompt, $options, $default)
+    protected function _getInput($prompt, $options, $default, $hidden = false)
     {
         $optionsText = '';
         if (isset($options)) {
@@ -485,7 +501,12 @@ class ConsoleIo
             $defaultText = "[$default] ";
         }
         $this->_out->write('<question>' . $prompt . "</question>$optionsText\n$defaultText> ", 0);
-        $result = $this->_in->read();
+
+        if ($hidden) {
+            $result = $this->_in->readHidden();
+        } else {
+            $result = $this->_in->read();
+        }
 
         $result = trim($result);
         if ($default !== null && ($result === '' || $result === null)) {
